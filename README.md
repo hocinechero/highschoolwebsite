@@ -49,7 +49,7 @@
 ### تشغيل سريع
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/hocinechero/highschoolwebsite
 cd inquiry-about-identity
 # لا بناء ولا تثبيت: افتح index.html مباشرة في المتصفح
 ```
@@ -76,10 +76,6 @@ cd inquiry-about-identity
 ### البيانات الأولية
 
 8 إعلانات بالصور، 3 أقسام، 75 حصة (25 لكل قسم)، 20 موعد اختبار، 4 وثائق داخلية.
-
-### المهارات المُظهرة
-
-بنية متعددة الملفات · تصميم صلاحيات RLS · طبقة تجريد بيانات بنمط fallback · مصادقة Supabase Auth · تكامل خارجي (Edge Function + Resend) بأسرار خارج المتصفح · توجيه SPA بالـ hash · RTL عربي كامل · وصولية ARIA · أنماط طباعة · استجابة من 320px.
 
 ### الحد الواقعي (مذكور بصراحة)
 
@@ -130,7 +126,7 @@ A digital platform for Lycée Dardar Bouzid in El Eulma (Sétif, Algeria), built
 ### Quick start
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/hocinechero/highschoolwebsite
 cd inquiry-about-identity
 # No build, no install: open index.html directly in a browser
 ```
@@ -157,10 +153,6 @@ Full step-by-step details with verification live in the inner `README.md`.
 ### Seed data
 
 8 announcements with images, 3 classes, 75 periods (25 per class), 20 exam dates, 4 internal documents.
-
-### Skills demonstrated
-
-Multi-file architecture · RLS permission design · data-layer abstraction with fallback pattern · Supabase Auth · external integration (Edge Function + Resend) with browser-invisible secrets · hash-based SPA routing · full Arabic RTL · ARIA accessibility · print stylesheets · responsive from 320px.
 
 ### The honest limitation
 
@@ -209,7 +201,7 @@ Une plateforme numérique pour le lycée Dardar Bouzid à El Eulma (Sétif, Alg�
 ### Démarrage rapide
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/hocinechero/highschoolwebsite
 cd inquiry-about-identity
 # Aucun build, aucune installation : ouvrir index.html dans le navigateur
 ```
@@ -236,10 +228,6 @@ Les détails complets, étape par étape avec vérification, figurent dans le `R
 ### Données initiales
 
 8 annonces avec images, 3 classes, 75 séances (25 par classe), 20 dates d'évaluations, 4 documents internes.
-
-### Compétences démontrées
-
-Architecture multi-fichiers · conception de permissions RLS · couche d'abstraction de données avec repli · Supabase Auth · intégration externe (Edge Function + Resend) avec secrets invisibles du navigateur · routage SPA par hash · RTL arabe complet · accessibilité ARIA · feuilles de style d'impression · responsive dès 320px.
 
 ### La limite, dite honnêtement
 
