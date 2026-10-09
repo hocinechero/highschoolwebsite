@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#052e16">
+  <title>لوحة الأساتذة | ثانوية دردار بوزيد</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2316a34a'/%3E%3Ctext x='32' y='44' font-family='Tahoma,Arial,sans-serif' font-size='30' font-weight='900' fill='white' text-anchor='middle'%3E%D8%AF%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="db.js"></script>
+  <style>
+    :root {
+      --emerald-50:#f0fdf4; --emerald-100:#dcfce7; --emerald-200:#bbf7d0; --emerald-500:#22c55e;
+      --emerald-600:#16a34a; --emerald-700:#15803d; --emerald-800:#166534; --emerald-900:#14532d; --emerald-950:#052e16;
+      --amber-50:#fefce8; --amber-200:#fef08a; --amber-400:#facc15; --amber-500:#eab308;
+      --slate-50:#f8fafc; --slate-100:#f1f5f9; --slate-200:#e2e8f0; --slate-300:#cbd5e1; --slate-400:#94a3b8;
+      --slate-500:#64748b; --slate-600:#475569; --slate-700:#334155; --slate-900:#0f172a;
+      --red-500:#ef4444;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; min-width:320px; background:var(--slate-50); color:var(--slate-700);
+      font-family:"Cairo",ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    :focus-visible { outline:2px solid var(--emerald-600); outline-offset:3px; }
+    [hidden] { display:none !important; }
+
+    .brand-mark { position:relative; display:grid; place-items:center; overflow:hidden;
+      background:linear-gradient(to top right,var(--emerald-700),var(--emerald-500)); color:white; }
+    .brand-mark::after { content:""; position:absolute; bottom:.25rem; left:.25rem; width:1rem; height:1rem; border-radius:9999px; background:var(--amber-500); border:2px solid white; }
+
+    .login-wrap { min-height:100svh; display:grid; place-items:center;
+      background:linear-gradient(to top right,var(--emerald-950),var(--emerald-900) 45%,var(--emerald-800)); }
+    .login-card { width:min(94vw,420px); border-radius:1.5rem; background:white; padding:2rem;
+      box-shadow:0 25px 50px -12px rgba(0,0,0,.4); }
+
+    .field { width:100%; border-radius:1rem; border:1px solid var(--slate-200); background:rgba(248,250,252,.7);
+      padding:.7rem 1rem; color:var(--slate-800); transition:all .2s; outline:none; }
+    .field:focus { background:white; border-color:var(--emerald-500); box-shadow:0 0 0 4px var(--emerald-100); }
+    .field::placeholder { color:var(--slate-400); }
+
+    .btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:.55rem; border-radius:1rem;
+      background:var(--emerald-600); padding:.75rem 1.5rem; font-weight:700; color:white;
+      box-shadow:0 10px 15px -3px rgba(22,163,74,.25); transition:all .2s; }
+    .btn-primary:hover { background:var(--emerald-700); }
+    .btn-primary:disabled { opacity:.6; cursor:wait; }
+    .btn-outline { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; border-radius:1rem;
+      border:1px solid var(--slate-300); background:white; padding:.55rem 1.1rem; font-weight:700; color:var(--slate-700); transition:all .2s; }
+    .btn-outline:hover { border-color:var(--emerald-300); color:var(--emerald-700); }
+    .btn-danger { border-radius:.8rem; padding:.4rem .8rem; font-size:.75rem; font-weight:700; color:var(--red-500); background:white;
+      border:1px solid #fecaca; transition:all .15s; }
+    .btn-danger:hover { background:#fef2f2; border-color:var(--red-500); }
+
+    .adm-tab { border-radius:9999px; padding:.55rem 1.15rem; font-size:.85rem; font-weight:700; color:var(--slate-600); transition:all .15s; }
+    .adm-tab:hover { background:var(--slate-50); color:var(--emerald-700); }
+    .adm-tab[aria-selected="true"] { background:var(--emerald-600); color:white; box-shadow:0 4px 6px -1px rgba(22,163,74,.3); }
+
+    .card { border-radius:1.25rem; border:1px solid var(--slate-200); background:white; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+    .icon-chip { display:grid; place-items:center; border-radius:1rem; background:var(--emerald-50); color:var(--emerald-700); box-shadow:inset 0 0 0 1px var(--emerald-100); }
+
+    .adm-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.75rem;
+      border-bottom:1px solid var(--slate-200); padding:.9rem 0; }
+    .adm-row:last-child { border-bottom:0; }
+
+    .badge { display:inline-flex; align-items:center; gap:.3rem; border-radius:9999px; padding:.25rem .65rem; font-size:.7rem; font-weight:800; }
+    .badge.new { background:var(--amber-50); color:#a16207; box-shadow:inset 0 0 0 1px var(--amber-200); }
+    .badge.done { background:var(--emerald-50); color:var(--emerald-700); box-shadow:inset 0 0 0 1px var(--emerald-200); }
+    .badge.rejected { background:#fef2f2; color:#b91c1c; box-shadow:inset 0 0 0 1px #fecaca; }
+    .badge.mode { background:var(--slate-100); color:var(--slate-600); }
+
+    .ref-pill { display:inline-flex; border-radius:9999px; background:var(--slate-100); padding:.2rem .6rem;
+      font-family:ui-monospace,monospace; font-size:.72rem; font-weight:800; color:var(--slate-700); direction:ltr; }
+
+    .toast { opacity:0; pointer-events:none; transform:translateY(16px); transition:.25s; }
+    .toast.show { opacity:1; transform:none; }
+
+    .thumb { width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:.75rem; }
+    table.adm-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+    table.adm-table th { text-align:right; padding:.6rem .75rem; color:var(--slate-400); font-weight:800; font-size:.72rem; }
+    table.adm-table td { padding:.6rem .75rem; border-top:1px solid var(--slate-100); font-weight:700; color:var(--slate-700); }
+
+    @media (max-width:640px) {
+      .adm-toolbar { flex-direction:column; align-items:stretch; }
+      .adm-toolbar .btn-outline { width:100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ تسجيل الدخول ============ -->
+  <div id="login-view" class="login-wrap" hidden>
+    <div class="login-card">
+      <div class="flex items-center gap-3">
+        <span class="brand-mark h-12 w-12 shrink-0 rounded-2xl"><svg class="h-6 w-6 fill-none stroke-current" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+        <div><p class="text-lg font-extrabold text-slate-900">لوحة الأساتذة</p><p class="text-xs font-semibold text-slate-500">ثانوية دردار بوزيد</p></div>
+      </div>
+      <div id="local-login" class="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900">
+        <b>الوضع المحلي التجريبي:</b> لا توجد قاعدة بيانات مربوطة بعد. الدخول تجريبي والبيانات تُحفظ داخل هذا المتصفح فقط.
+      </div>
+      <form id="login-form" class="mt-6 space-y-4" hidden>
+        <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">البريد الإلكتروني</span>
+          <input id="login-email" type="email" required class="field" dir="ltr" placeholder="teacher@example.com"></label>
+        <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">كلمة المرور</span>
+          <input id="login-password" type="password" required class="field" placeholder="••••••••"></label>
+        <p id="login-error" class="hidden rounded-xl bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600"></p>
+        <button type="submit" class="btn-primary w-full">تسجيل الدخول</button>
+      </form>
+      <button id="demo-login" type="button" class="btn-outline mt-4 w-full" hidden>دخول تجريبي</button>
+      <a href="index.html" class="mt-4 block text-center text-sm font-bold text-emerald-700 hover:underline">→ العودة إلى الموقع العام</a>
+    </div>
+  </div>
+
+  <!-- ============ اللوحة ============ -->
+  <div id="app-view" hidden>
+    <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/85 backdrop-blur-md">
+      <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <div class="flex items-center gap-3">
+          <span class="brand-mark h-10 w-10 rounded-2xl"><svg class="h-5 w-5 fill-none stroke-current" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+          <div><p class="text-base font-extrabold text-slate-900">لوحة الأساتذة</p><p class="text-[11px] font-semibold text-slate-500">إدارة محتوى ثانوية دردار بوزيد</p></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="mode-badge" class="badge mode"></span>
+          <button id="logout" type="button" class="btn-outline !py-2 text-sm">خروج</button>
+        </div>
+      </div>
+      <div class="mx-auto max-w-6xl overflow-x-auto px-4 pb-3 sm:px-6">
+        <div class="flex gap-1 rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm w-max" role="tablist" aria-label="أقسام اللوحة">
+          <button class="adm-tab" data-tab="news" role="tab" aria-selected="true" aria-controls="pane-news">نشر إعلان</button>
+          <button class="adm-tab" data-tab="schedule" role="tab" aria-selected="false" aria-controls="pane-schedule">تحديث الجدول</button>
+          <button class="adm-tab" data-tab="docs" role="tab" aria-selected="false" aria-controls="pane-docs">الوثائق</button>
+          <button class="adm-tab" data-tab="requests" role="tab" aria-selected="false" aria-controls="pane-requests">الطلبات</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+
+      <!-- ===== نشر إعلان ===== -->
+      <section id="pane-news" role="tabpanel" tabindex="0">
+        <div class="grid gap-8 lg:grid-cols-[.9fr_1.1fr]">
+          <form id="news-form" class="card p-6" novalidate>
+            <h2 class="text-lg font-extrabold text-slate-900">إعلان جديد</h2>
+            <p class="mt-1 text-xs font-bold text-slate-400">يظهر فوراً في صفحة الإعلانات بالموقع العام.</p>
+            <label class="mt-5 block"><span class="mb-2 block text-sm font-extrabold text-slate-700">العنوان</span>
+              <input id="nf-title" required class="field" placeholder="مثال: تعديل موعد اختبار الرياضيات"></label>
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+              <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">التصنيف</span>
+                <select id="nf-category" class="field"><option>عام</option><option>دراسة</option><option>أنشطة</option><option>تواصل</option><option>رقمي</option><option>توجيه</option></select></label>
+              <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">التاريخ</span>
+                <input id="nf-date" type="date" class="field" value=""></label>
+            </div>
+            <label class="mt-4 block"><span class="mb-2 block text-sm font-extrabold text-slate-700">النص</span>
+              <textarea id="nf-body" required rows="5" class="field resize-y leading-relaxed" placeholder="نص الإعلان كما سيظهر للتلاميذ والأولياء…"></textarea></label>
+            <label class="mt-4 block"><span class="mb-2 block text-sm font-extrabold text-slate-700">رابط الصورة <i class="not-italic font-semibold text-slate-400">اختياري</i></span>
+              <input id="nf-image" type="url" dir="ltr" class="field" placeholder="https://…/photo.jpg">
+              <img id="nf-preview" class="thumb mt-3" alt="" hidden></label>
+            <label class="mt-4 flex items-center gap-3 font-bold text-slate-700">
+              <input id="nf-featured" type="checkbox" class="h-4 w-4 accent-emerald-600"> عرض في الصفحة الرئيسية</label>
+            <button type="submit" class="btn-primary mt-6 w-full">نشر الإعلان</button>
+          </form>
+
+          <div class="card p-6">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-extrabold text-slate-900">الإعلانات المنشورة</h2>
+              <span id="news-count" class="text-xs font-bold text-slate-400"></span>
+            </div>
+            <div id="news-admin-list" class="mt-4"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== تحديث الجدول ===== -->
+      <section id="pane-schedule" role="tabpanel" tabindex="0" hidden>
+        <div class="grid gap-8 lg:grid-cols-[.9fr_1.1fr]">
+          <div class="space-y-6">
+            <form id="period-form" class="card p-6" novalidate>
+              <h2 class="text-lg font-extrabold text-slate-900">إضافة حصة</h2>
+              <label class="mt-5 block"><span class="mb-2 block text-sm font-extrabold text-slate-700">القسم</span>
+                <select id="pf-class" class="field"></select></label>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">اليوم</span>
+                  <select id="pf-day" class="field"></select></label>
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">المادة</span>
+                  <input id="pf-subject" required class="field" placeholder="مثال: الرياضيات"></label>
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">من</span>
+                  <input id="pf-start" type="time" required class="field" value="08:00"></label>
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">إلى</span>
+                  <input id="pf-end" type="time" required class="field" value="09:00"></label>
+              </div>
+              <label class="mt-4 block"><span class="mb-2 block text-sm font-extrabold text-slate-700">القاعة</span>
+                <input id="pf-room" class="field" placeholder="مثال: ق 12 / مخبر الفيزياء"></label>
+              <button type="submit" class="btn-primary mt-6 w-full">إضافة الحصة</button>
+            </form>
+
+            <form id="class-form" class="card p-6">
+              <h2 class="text-lg font-extrabold text-slate-900">قسم جديد</h2>
+              <p class="mt-1 text-xs font-bold text-slate-400">أضف الأقسام الفعلية للمؤسسة، ثم أدرج حصصها.</p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-[1fr_auto]">
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">اسم القسم</span>
+                  <input id="cf-name" required class="field" placeholder="مثال: السنة الأولى ثانوي — 2"></label>
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">المستوى</span>
+                  <select id="cf-level" class="field"><option value="0">السنة الأولى</option><option value="1">السنة الثانية</option><option value="2">السنة الثالثة</option></select></label>
+              </div>
+              <button type="submit" class="btn-outline mt-5 w-full">إضافة القسم</button>
+            </form>
+          </div>
+
+          <div class="card p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h2 class="text-lg font-extrabold text-slate-900">حصص القسم</h2>
+              <label class="flex items-center gap-2 text-sm font-bold text-slate-500">
+                <select id="view-class" class="field !w-auto !py-1.5 text-sm"></select>
+              </label>
+            </div>
+            <div id="schedule-admin-list" class="mt-4"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== الوثائق ===== -->
+      <section id="pane-docs" role="tabpanel" tabindex="0" hidden>
+        <div class="grid gap-8 lg:grid-cols-[.9fr_1.1fr]">
+          <form id="doc-form" class="card p-6" novalidate>
+            <h2 class="text-lg font-extrabold text-slate-900">وثيقة داخلية جديدة</h2>
+            <p class="mt-1 text-xs font-bold text-slate-400">متاحة للأسرة التربوية داخل اللوحة فقط.</p>
+            <label class="mt-5 block"><span class="mb-2 block text-sm font-extrabold text-slate-700">العنوان</span>
+              <input id="df-title" required class="field" placeholder="مثال: دليل إجراءات مجالس الأقسام"></label>
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+              <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">النوع</span>
+                <select id="df-kind" class="field"><option>نموذج</option><option>دليل</option><option>جدول</option><option>مذكرة</option><option>أخرى</option></select></label>
+              <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">الحجم</span>
+                <input id="df-size" class="field" placeholder="مثال: 1.2 MB"></label>
+            </div>
+            <label class="mt-4 block"><span class="mb-2 block text-sm font-extrabold text-slate-700">رابط الملف <i class="not-italic font-semibold text-slate-400">(Supabase Storage أو أي رابط)</i></span>
+              <input id="df-url" type="url" dir="ltr" class="field" placeholder="https://…/file.pdf"></label>
+            <button type="submit" class="btn-primary mt-6 w-full">إضافة الوثيقة</button>
+          </form>
+
+          <div class="card p-6">
+            <h2 class="text-lg font-extrabold text-slate-900">الوثائق المتوفرة</h2>
+            <div id="docs-admin-list" class="mt-4"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== الطلبات ===== -->
+      <section id="pane-requests" role="tabpanel" tabindex="0" hidden>
+        <div class="card p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-extrabold text-slate-900">طلبات مواعيد الأولياء</h2>
+            <span id="requests-count" class="text-xs font-bold text-slate-400"></span>
+          </div>
+          <p class="mt-1 text-xs font-bold text-slate-400">تصل الطلبات هنا فور إرسالها من الموقع العام.</p>
+          <div id="requests-list" class="mt-4" aria-live="polite"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast fixed bottom-5 right-5 z-[120] max-w-sm rounded-2xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-2xl" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+      const escapeHtml = v => String(v ?? "").replace(/[&<>'"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;" })[c]);
+
+      const state = { news: [], classes: [], schedule: [], docs: [], requests: [] };
+      let viewClass = null, toastTimer;
+
+      function toast(text) { const el = $("#toast"); el.textContent = text; el.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 3200); }
+      function fmtDate(iso) { if (!iso) return ""; const d = new Date(String(iso).length <= 10 ? iso + "T00:00:00" : iso); return isNaN(d) ? String(iso) : d.toLocaleDateString("ar-DZ", { day:"numeric", month:"long", year:"numeric" }); }
+      function byDateDesc(list) { return [...list].sort((a, b) => String(b.date || b.created_at || "").localeCompare(String(a.date || a.created_at || ""))); }
+
+      /* ---------- الدخول ---------- */
+      const localMode = DB.mode === "local";
+
+      async function boot() {
+        $("#mode-badge").textContent = localMode ? "وضع محلي تجريبي" : "متصل بقاعدة البيانات";
+        if (localMode) {
+          $("#local-login").hidden = false; $("#login-form").hidden = true; $("#demo-login").hidden = false;
+        } else {
+          $("#local-login").hidden = true; $("#login-form").hidden = false;
+          const session = await DB.auth.session();
+          if (session) enterApp();
+        }
+        $("#login-view").hidden = false;
+      }
+
+      $("#login-form").addEventListener("submit", async e => {
+        e.preventDefault();
+        const btn = e.submitter || $("#login-form button[type=submit]");
+        btn.disabled = true; btn.textContent = "جارٍ التحقق…";
+        const res = await DB.auth.login($("#login-email").value.trim(), $("#login-password").value);
+        btn.disabled = false; btn.textContent = "تسجيل الدخول";
+        if (res.ok) { $("#login-error").classList.add("hidden"); enterApp(); }
+        else { $("#login-error").textContent = res.error || "بيانات الدخول غير صحيحة"; $("#login-error").classList.remove("hidden"); }
+      });
+
+      $("#demo-login").addEventListener("click", () => { sessionStorage.setItem("dardar-demo-admin", "1"); enterApp(); });
+
+      $("#logout").addEventListener("click", async () => {
+        sessionStorage.removeItem("dardar-demo-admin");
+        await DB.auth.logout();
+        location.reload();
+      });
+
+      async function enterApp() {
+        $("#login-view").hidden = true;
+        $("#app-view").hidden = false;
+        await refreshAll();
+      }
+
+      /* ---------- التبويبات ---------- */
+      $$('[data-tab]').forEach(t => t.addEventListener("click", () => {
+        $$('[data-tab]').forEach(i => i.setAttribute("aria-selected", String(i === t)));
+        $$('main > section').forEach(s => s.hidden = s.id !== "pane-" + t.dataset.tab);
+      }));
+
+      /* ---------- البيانات ---------- */
+      async function refreshAll() {
+        const [news, classes, schedule, docs, requests] = await Promise.all([
+          DB.list("announcements"), DB.list("classes"), DB.list("schedule"), DB.list("documents"), DB.list("appointments")
+        ]);
+        state.news = news; state.classes = classes; state.schedule = schedule; state.docs = docs; state.requests = requests;
+        if (viewClass != null && classes.some(c => String(c.id) === String(viewClass))) {
+          /* keep */ } else { viewClass = classes[0]?.id ?? null; }
+        const opts = cls => classes.map(c => `<option value="${c.id}" ${String(c.id) === String(cls) ? "selected" : ""}>${escapeHtml(c.name)}</option>`).join("");
+        $("#pf-class").innerHTML = opts(viewClass);
+        $("#view-class").innerHTML = opts(viewClass);
+        $("#pf-day").innerHTML = DAYS.map((d, i) => `<option value="${i}">${d}</option>`).join("");
+        renderNewsList(); renderScheduleList(); renderDocsList(); renderRequests();
+      }
+
+      async function guard(fn) {
+        try { await fn(); }
+        catch (e) {
+          const msg = String(e.message || e);
+          if (/row-level security|permission/i.test(msg)) toast("ليست لديك صلاحية — تأكد من إضافة حسابك في جدول staff");
+          else toast("تعذّر الحفظ: " + msg);
+        }
+      }
+
+      /* ---------- الإعلانات ---------- */
+      function renderNewsList() {
+        const list = byDateDesc(state.news);
+        $("#news-count").textContent = `${list.length} إعلان`;
+        $("#news-admin-list").innerHTML = list.length ? list.map(n => `<div class="adm-row">
+          <div class="flex min-w-0 items-center gap-3">
+            ${n.image_url ? `<img src="${escapeHtml(n.image_url)}" alt="" class="h-10 w-16 shrink-0 rounded-lg object-cover">` : ""}
+            <div class="min-w-0"><b class="block truncate text-sm text-slate-900">${escapeHtml(n.title)}</b>
+            <small class="text-[11px] font-bold text-slate-400">${escapeHtml(n.category || "")} • ${escapeHtml(fmtDate(n.date))}${n.featured ? " • رئيسية" : ""}</small></div>
+          </div>
+          <button type="button" data-del-news="${n.id}" class="btn-danger">حذف</button>
+        </div>`).join("") : `<p class="py-6 text-center text-sm text-slate-400">لا إعلانات بعد.</p>`;
+      }
+
+      $("#nf-image").addEventListener("input", e => {
+        const p = $("#nf-preview");
+        if (e.target.value.trim()) { p.src = e.target.value.trim(); p.hidden = false; } else { p.hidden = true; }
+      });
+      $("#nf-date").value = new Date().toISOString().slice(0, 10);
+
+      $("#news-form").addEventListener("submit", e => {
+        e.preventDefault();
+        guard(async () => {
+          await DB.insert("announcements", {
+            title: $("#nf-title").value.trim(),
+            category: $("#nf-category").value,
+            body: $("#nf-body").value.trim(),
+            image_url: $("#nf-image").value.trim() || null,
+            featured: $("#nf-featured").checked,
+            date: $("#nf-date").value || new Date().toISOString().slice(0, 10)
+          });
+          toast("نُشر الإعلان");
+          e.target.reset();
+          $("#nf-preview").hidden = true;
+          $("#nf-date").value = new Date().toISOString().slice(0, 10);
+          await refreshAll();
+        });
+      });
+
+      /* ---------- الجدول ---------- */
+      function renderScheduleList() {
+        const rows = state.schedule.filter(r => String(r.class_id) === String(viewClass))
+          .sort((a, b) => Number(a.day) - Number(b.day) || String(a.start_time).localeCompare(String(b.start_time)));
+        $("#schedule-admin-list").innerHTML = rows.length
+          ? `<table class="adm-table"><thead><tr><th>اليوم</th><th>التوقيت</th><th>المادة</th><th>القاعة</th><th></th></tr></thead><tbody>
+            ${rows.map(r => `<tr><td>${DAYS[r.day] || ""}</td><td dir="ltr" class="tabular-nums">${escapeHtml(r.start_time || "")} – ${escapeHtml(r.end_time || "")}</td>
+            <td>${escapeHtml(r.subject || "")}</td><td class="text-slate-400">${escapeHtml(r.room || "")}</td>
+            <td><button type="button" data-del-period="${r.id}" class="btn-danger">حذف</button></td></tr>`).join("")}
+            </tbody></table>`
+          : `<p class="py-6 text-center text-sm text-slate-400">لا حصص لهذا القسم. أضفها من النموذج.</p>`;
+      }
+
+      $("#view-class").addEventListener("change", e => { viewClass = e.target.value; renderScheduleList(); });
+
+      $("#period-form").addEventListener("submit", e => {
+        e.preventDefault();
+        guard(async () => {
+          await DB.insert("schedule", {
+            class_id: Number($("#pf-class").value) || $("#pf-class").value,
+            day: Number($("#pf-day").value),
+            start_time: $("#pf-start").value,
+            end_time: $("#pf-end").value,
+            subject: $("#pf-subject").value.trim(),
+            room: $("#pf-room").value.trim() || null
+          });
+          toast("أُضيفت الحصة");
+          $("#pf-subject").value = ""; $("#pf-room").value = "";
+          viewClass = $("#pf-class").value;
+          await refreshAll();
+        });
+      });
+
+      $("#class-form").addEventListener("submit", e => {
+        e.preventDefault();
+        guard(async () => {
+          const rec = await DB.insert("classes", { name: $("#cf-name").value.trim(), level: Number($("#cf-level").value) });
+          toast("أُضيف القسم");
+          $("#cf-name").value = "";
+          viewClass = rec.id;
+          await refreshAll();
+        });
+      });
+
+      /* ---------- الوثائق ---------- */
+      function renderDocsList() {
+        $("#docs-admin-list").innerHTML = state.docs.length ? state.docs.map(d => `<div class="adm-row">
+          <div class="min-w-0"><b class="block truncate text-sm text-slate-900">${escapeHtml(d.title)}</b>
+          <small class="text-[11px] font-bold text-slate-400">${escapeHtml(d.kind || "")}${d.size ? " • " + escapeHtml(d.size) : ""}</small></div>
+          <div class="flex items-center gap-2">
+            ${d.url ? `<a href="${escapeHtml(d.url)}" target="_blank" rel="noopener noreferrer" class="btn-outline !py-1.5 text-xs">فتح</a>` : ""}
+            <button type="button" data-del-doc="${d.id}" class="btn-danger">حذف</button>
+          </div>
+        </div>`).join("") : `<p class="py-6 text-center text-sm text-slate-400">لا وثائق بعد.</p>`;
+      }
+
+      $("#doc-form").addEventListener("submit", e => {
+        e.preventDefault();
+        guard(async () => {
+          await DB.insert("documents", {
+            title: $("#df-title").value.trim(),
+            kind: $("#df-kind").value,
+            size: $("#df-size").value.trim() || null,
+            url: $("#df-url").value.trim() || null
+          });
+          toast("أُضيفت الوثيقة");
+          e.target.reset(); await refreshAll();
+        });
+      });
+
+      /* ---------- الطلبات ---------- */
+      function renderRequests() {
+        const list = [...state.requests].sort((a, b) => String(b.created_at || b.ref).localeCompare(String(a.created_at || a.ref)));
+        $("#requests-count").textContent = `${list.length} طلب`;
+        $("#requests-list").innerHTML = list.length ? list.map(r => {
+          const st = r.status || "جديد";
+          const badge = st === "مؤكد" ? "done" : st === "مرفوض" ? "rejected" : "new";
+          return `<div class="adm-row">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="ref-pill">${escapeHtml(r.ref || "")}</span>
+                <span class="badge ${badge}">${escapeHtml(st)}</span>
+                <small class="text-[11px] font-bold text-slate-400">${escapeHtml(fmtDate(r.created_at))}</small>
+              </div>
+              <b class="mt-1.5 block text-sm text-slate-900">${escapeHtml(r.parent_name || "")} — ${escapeHtml(r.student_name || "")}</b>
+              <small class="mt-0.5 block text-xs font-bold text-slate-500">${escapeHtml(r.class_name || "")} • ${escapeHtml(r.preferred_date || "")} • ${escapeHtml(r.slot || "")}</small>
+              <small class="mt-0.5 block text-xs" dir="ltr" style="text-align:right">${escapeHtml(r.phone || "")}</small>
+              ${r.reason ? `<p class="mt-1.5 rounded-xl bg-slate-50 p-2.5 text-xs leading-6 text-slate-600">${escapeHtml(r.reason)}</p>` : ""}
+            </div>
+            <div class="flex items-center gap-2">
+              <select data-status-req="${r.id}" class="field !w-auto !py-1.5 !text-xs" aria-label="تغيير الحالة">
+                <option ${st === "جديد" ? "selected" : ""}>جديد</option>
+                <option ${st === "مؤكد" ? "selected" : ""}>مؤكد</option>
+                <option ${st === "مرفوض" ? "selected" : ""}>مرفوض</option>
+              </select>
+              <button type="button" data-del-req="${r.id}" class="btn-danger">حذف</button>
+            </div>
+          </div>`;
+        }).join("") : `<p class="py-6 text-center text-sm text-slate-400">لا طلبات بعد. ستظهر هنا فور إرسالها من الموقع العام.</p>`;
+      }
+
+      /* ---------- الحذف وتغيير الحالة ---------- */
+      document.addEventListener("click", e => {
+        const delNews = e.target.closest("[data-del-news]");
+        if (delNews && confirm("حذف هذا الإعلان نهائياً؟")) guard(async () => { await DB.remove("announcements", delNews.dataset.delNews); toast("حُذف الإعلان"); await refreshAll(); });
+
+        const delPeriod = e.target.closest("[data-del-period]");
+        if (delPeriod && confirm("حذف هذه الحصة؟")) guard(async () => { await DB.remove("schedule", delPeriod.dataset.delPeriod); toast("حُذفت الحصة"); await refreshAll(); });
+
+        const delDoc = e.target.closest("[data-del-doc]");
+        if (delDoc && confirm("حذف هذه الوثيقة؟")) guard(async () => { await DB.remove("documents", delDoc.dataset.delDoc); toast("حُذفت الوثيقة"); await refreshAll(); });
+
+        const delReq = e.target.closest("[data-del-req]");
+        if (delReq && confirm("حذف هذا الطلب؟")) guard(async () => { await DB.remove("appointments", delReq.dataset.delReq); toast("حُذف الطلب"); await refreshAll(); });
+      });
+
+      document.addEventListener("change", e => {
+        const sel = e.target.closest("[data-status-req]");
+        if (sel) guard(async () => { await DB.update("appointments", sel.dataset.statusReq, { status: sel.value }); toast("حُدِّثت الحالة"); await refreshAll(); });
+      });
+
+      boot();
+    })();
+  </script>
+</body>
+</html>

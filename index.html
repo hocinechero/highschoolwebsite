@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#052e16">
+  <meta name="description" content="الموقع الرسمي لثانوية دردار بوزيد بالعلمة، ولاية سطيف: الإعلانات، الجدول الدراسي، الاختبارات والتواصل.">
+  <meta property="og:locale" content="ar_DZ">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ثانوية دردار بوزيد">
+  <meta property="og:title" content="ثانوية دردار بوزيد | العلمة - سطيف">
+  <meta property="og:description" content="الإعلانات، الجدول الدراسي، الاختبارات والتواصل — البوابة الرسمية.">
+  <meta property="og:image" content="https://images.pexels.com/photos/34211747/pexels-photo-34211747.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=630&w=1200">
+  <title>ثانوية دردار بوزيد | العلمة - سطيف</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2316a34a'/%3E%3Ctext x='32' y='44' font-family='Tahoma,Arial,sans-serif' font-size='30' font-weight='900' fill='white' text-anchor='middle'%3E%D8%AF%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="db.js"></script>
+  <style>
+    :root {
+      --emerald-50:#f0fdf4; --emerald-100:#dcfce7; --emerald-200:#bbf7d0; --emerald-300:#86efac;
+      --emerald-500:#22c55e; --emerald-600:#16a34a; --emerald-700:#15803d; --emerald-800:#166534; --emerald-900:#14532d; --emerald-950:#052e16;
+      --amber-200:#fef08a; --amber-400:#facc15; --amber-500:#eab308; --amber-50:#fefce8;
+      --slate-50:#f8fafc; --slate-100:#f1f5f9; --slate-200:#e2e8f0; --slate-300:#cbd5e1; --slate-400:#94a3b8;
+      --slate-500:#64748b; --slate-600:#475569; --slate-700:#334155; --slate-900:#0f172a;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    [id] { scroll-margin-top: 90px; }
+    body { margin:0; min-width:320px; overflow-x:hidden; background:var(--slate-50); color:var(--slate-700);
+      font-family:"Cairo",ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    a,button { -webkit-tap-highlight-color:transparent; }
+    ::selection { background:var(--emerald-200); color:var(--emerald-950); }
+    :focus-visible { outline:2px solid var(--emerald-600); outline-offset:3px; }
+    [hidden] { display:none !important; }
+    .skip-link { position:fixed; top:.75rem; right:1rem; z-index:200; transform:translateY(-170%);
+      border-radius:1rem; background:white; padding:.75rem 1.1rem; font-weight:800; box-shadow:0 10px 15px -3px rgba(0,0,0,.1); transition:transform .2s; }
+    .skip-link:focus { transform:translateY(0); }
+
+    .site-header { transition:background-color .3s,border-color .3s,box-shadow .3s,backdrop-filter .3s; }
+    .site-header.is-scrolled { border-color:rgba(226,232,240,.8); background:rgba(255,255,255,.85); box-shadow:0 1px 3px rgba(0,0,0,.1); backdrop-filter:blur(24px); }
+    .brand-mark { position:relative; display:grid; place-items:center; overflow:hidden;
+      background:linear-gradient(to top right,var(--emerald-700),var(--emerald-500)); color:white; }
+    .brand-mark::after { content:""; position:absolute; bottom:.25rem; left:.25rem; width:1rem; height:1rem; border-radius:9999px; background:var(--amber-500); border:2px solid white; }
+    .nav-link { border-radius:9999px; padding:.5rem 1.05rem; font-size:.82rem; font-weight:700; color:var(--slate-600); transition:all .15s; }
+    .nav-link:hover { background:var(--slate-50); color:var(--emerald-700); }
+    .nav-link.active { background:var(--emerald-50); color:var(--emerald-700); box-shadow:0 0 0 1px var(--emerald-200); }
+    [data-mobile-nav] { border-radius:1.5rem; padding:.8rem 1rem; font-weight:700; color:var(--slate-700); transition:all .15s; }
+    [data-mobile-nav]:hover { background:var(--slate-50); }
+    [data-mobile-nav].active { background:var(--emerald-50); color:var(--emerald-700); }
+
+    .route { animation:page-in .45s ease-out both; }
+    @keyframes page-in { from{opacity:0} to{opacity:1} }
+
+    .hero { position:relative; overflow:hidden; }
+    .hero-glow { position:absolute; width:24rem; height:24rem; border-radius:9999px; filter:blur(64px); background:var(--emerald-200); opacity:.5; pointer-events:none; }
+    .hero-word { display:inline-block; opacity:0; filter:blur(8px); transform:translateY(45%); animation:word-in .7s cubic-bezier(.22,1,.36,1) forwards; animation-delay:var(--delay,0s); }
+    @keyframes word-in { to{opacity:1;filter:blur(0);transform:none} }
+    .fade-up { opacity:0; transform:translateY(18px); animation:fade-up .7s cubic-bezier(.22,1,.36,1) forwards; }
+    .fade-up.d1{animation-delay:.1s} .fade-up.d2{animation-delay:.2s} .fade-up.d3{animation-delay:.3s}
+    @keyframes fade-up { to{opacity:1;transform:none} }
+
+    .kicker { display:inline-flex; align-items:center; gap:.55rem; font-size:.8rem; font-weight:800; color:var(--emerald-700); }
+    .kicker::before { content:""; width:1.75rem; height:2px; border-radius:9999px; background:var(--amber-400); }
+    .title-balance { text-wrap:balance; }
+    .reveal { opacity:0; transform:translateY(24px); transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1); }
+    .reveal.is-visible { opacity:1; transform:none; }
+
+    .card { border-radius:1.5rem; border:1px solid rgba(226,232,240,.8); background:white; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+    .icon-chip { display:grid; place-items:center; border-radius:1rem; background:var(--emerald-50); color:var(--emerald-700); box-shadow:inset 0 0 0 1px var(--emerald-100); }
+    .lift { transition:transform .25s,border-color .25s,box-shadow .25s; }
+    .lift:hover { transform:translateY(-5px); border-color:var(--emerald-200); box-shadow:0 10px 15px -3px rgba(0,0,0,.1); }
+
+    .news-card img { width:100%; aspect-ratio:16/10; object-fit:cover; }
+
+    .btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:.55rem; border-radius:1rem;
+      background:var(--emerald-600); padding:.8rem 1.75rem; font-weight:700; color:white;
+      box-shadow:0 10px 15px -3px rgba(22,163,74,.25); transition:all .2s; }
+    .btn-primary:hover { background:var(--emerald-700); transform:translateY(-2px); }
+    .btn-outline { display:inline-flex; align-items:center; justify-content:center; gap:.55rem; border-radius:1rem;
+      border:1px solid var(--slate-300); background:white; padding:.8rem 1.75rem; font-weight:700; color:var(--slate-700); transition:all .2s; }
+    .btn-outline:hover { border-color:var(--emerald-300); color:var(--emerald-700); }
+
+    .field { width:100%; border-radius:1rem; border:1px solid var(--slate-200); background:rgba(248,250,252,.7);
+      padding:.75rem 1rem; color:var(--slate-800); transition:all .2s; outline:none; }
+    .field::placeholder { color:var(--slate-400); }
+    .field:focus { background:white; border-color:var(--emerald-500); box-shadow:0 0 0 4px var(--emerald-100); }
+    .filter-button { border-radius:9999px; border:1px solid var(--slate-200); background:white; padding:.5rem 1.1rem;
+      font-size:.82rem; font-weight:700; color:var(--slate-600); transition:all .2s; }
+    .filter-button:hover { border-color:var(--slate-300); }
+    .filter-button[aria-pressed="true"] { border-color:var(--emerald-200); background:var(--emerald-100); color:var(--emerald-800); box-shadow:0 0 0 2px rgba(187,247,208,.6); }
+    .badge-live { display:inline-flex; align-items:center; gap:.35rem; border-radius:9999px; background:var(--emerald-50);
+      padding:.3rem .7rem; font-size:.7rem; font-weight:800; color:var(--emerald-700); box-shadow:inset 0 0 0 1px var(--emerald-200); }
+
+    .subhero { position:relative; overflow:hidden; color:white; background:linear-gradient(to top right,var(--emerald-950),var(--emerald-900) 45%,var(--emerald-800)); }
+    .subhero::before { content:""; position:absolute; inset:0; opacity:.5;
+      background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);
+      background-size:62px 62px; mask-image:radial-gradient(circle at 80% 0%,black,transparent 70%); }
+    .subhero::after { content:""; position:absolute; inset:0; background:radial-gradient(circle at 10% 0%,rgba(250,204,21,.18),transparent 40%); }
+    .crumb { display:flex; align-items:center; gap:.5rem; font-size:.75rem; font-weight:700; color:rgba(255,255,255,.7); }
+    .crumb a:hover { color:white; text-decoration:underline; }
+    .crumb [aria-current] { color:white; }
+
+    /* ===== الجدول الدراسي ===== */
+    .timetable { width:100%; border-collapse:separate; border-spacing:.4rem; }
+    .timetable th, .timetable td { border-radius:.9rem; padding:.65rem .8rem; text-align:center; font-size:.85rem; }
+    .timetable thead th { background:var(--emerald-950); color:white; font-weight:800; }
+    .timetable .time-cell { background:var(--emerald-50); color:var(--emerald-800); font-weight:800; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .timetable .slot { background:white; border:1px solid var(--slate-200); font-weight:700; color:var(--slate-800); }
+    .timetable .slot small { display:block; margin-top:.15rem; font-size:.7rem; font-weight:700; color:var(--slate-400); }
+    .timetable .empty-slot { background:var(--slate-50); color:var(--slate-300); font-weight:700; }
+    .timetable-wrap { overflow-x:auto; border-radius:1.5rem; border:1px solid var(--slate-200); background:white; padding:1rem; }
+
+    .exam-row { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:1rem;
+      border-radius:1.25rem; border:1px solid var(--slate-200); background:white; padding:.95rem 1.15rem;
+      transition:border-color .2s,transform .2s,box-shadow .2s; }
+    .exam-row:hover { border-color:var(--emerald-300); transform:translateY(-2px); box-shadow:0 6px 12px -4px rgba(0,0,0,.08); }
+    .time-pill { border-radius:9999px; background:var(--emerald-50); padding:.35rem .8rem; font-size:.78rem;
+      font-weight:800; color:var(--emerald-700); font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .empty-state { border-radius:1.5rem; border:1px dashed var(--slate-300); background:var(--slate-50); padding:2.5rem 1.5rem; text-align:center; }
+    .ref-pill { display:inline-flex; align-items:center; gap:.4rem; border-radius:9999px; background:var(--slate-100);
+      padding:.3rem .75rem; font-family:ui-monospace,monospace; font-size:.78rem; font-weight:800; color:var(--slate-700); direction:ltr; }
+    .meta-line { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; font-size:.74rem; font-weight:700; color:var(--slate-400); }
+
+    .toast { opacity:0; pointer-events:none; transform:translateY(16px); transition:.25s; }
+    .toast.show { opacity:1; transform:none; }
+    .back-top { opacity:0; pointer-events:none; transform:translateY(10px); transition:.25s; }
+    .back-top.show { opacity:1; pointer-events:auto; transform:none; }
+    .mode-banner { transform:translateY(-110%); transition:transform .25s; }
+    .mode-banner.show { transform:translateY(0); }
+
+    @media (max-width:900px) {
+      .exam-row { grid-template-columns:1fr auto; }
+      .exam-row .exam-level { display:none; }
+    }
+    @media (max-width:640px) {
+      .timetable th,.timetable td { padding:.5rem .55rem; font-size:.75rem; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      html { scroll-behavior:auto; }
+      *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+      .reveal,.fade-up,.hero-word { opacity:1 !important; transform:none !important; filter:none !important; }
+    }
+    @media print {
+      @page { margin:16mm; }
+      body { background:white; color:black; font-size:11pt; }
+      header,footer,button,iframe,.back-top,.toast { display:none !important; }
+      .subhero { background:white !important; color:black !important; }
+      .subhero::before,.subhero::after,.hero-glow { display:none !important; }
+      .subhero h1,.subhero p { color:black !important; }
+      section { padding-block:1.25rem !important; break-inside:avoid; }
+      .reveal { opacity:1; transform:none; }
+      a { color:black; text-decoration:underline; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><div style="padding:12px;text-align:center;background:#fef9c3;color:#713f12;font-weight:700">يلزم تفعيل JavaScript لتشغيل الموقع.</div></noscript>
+  <a class="skip-link" href="#main-content">تخطّي إلى المحتوى</a>
+  <div id="mode-banner" class="mode-banner fixed inset-x-0 top-0 z-[200] bg-amber-100 px-4 py-2.5 text-center text-xs font-extrabold text-amber-800" role="status" hidden>
+    الوضع المحلي التجريبي — البيانات محفوظة داخل هذا المتصفح فقط. اربط قاعدة البيانات من ملف config.js.
+  </div>
+
+  <div class="bg-emerald-950 px-4 py-2 text-center text-[11px] font-bold text-white/75 sm:text-xs">
+    <span>الجمهورية الجزائرية الديمقراطية الشعبية</span><span class="mx-2 text-amber-400" aria-hidden="true">•</span><span>وزارة التربية الوطنية</span><span class="mx-2 hidden text-amber-400 sm:inline" aria-hidden="true">•</span><span class="hidden sm:inline">مديرية التربية لولاية سطيف</span>
+  </div>
+
+  <header id="site-header" class="site-header sticky top-0 z-50 border-b border-transparent bg-white/60 backdrop-blur-md">
+    <div class="mx-auto flex h-18 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <a href="#/home" class="group flex min-w-0 items-center gap-3" aria-label="ثانوية دردار بوزيد — الرئيسية">
+        <span class="brand-mark h-12 w-12 shrink-0 rounded-2xl"><svg class="h-6 w-6 fill-none stroke-current" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg></span>
+        <span class="min-w-0 leading-tight">
+          <span class="block truncate text-base font-extrabold text-slate-900 sm:text-lg" data-school-name></span>
+          <span class="block text-xs font-semibold text-slate-500" data-school-city></span>
+        </span>
+      </a>
+
+      <nav class="hidden items-center gap-1 rounded-full border border-slate-200/80 bg-white/80 p-1.5 shadow-sm lg:flex" aria-label="القائمة الرئيسية">
+        <a class="nav-link" data-nav="home" href="#/home">الرئيسية</a>
+        <a class="nav-link" data-nav="news" href="#/news">الإعلانات</a>
+        <a class="nav-link" data-nav="schedule" href="#/schedule">الجدول</a>
+        <a class="nav-link" data-nav="exams" href="#/exams">الاختبارات</a>
+        <a class="nav-link" data-nav="contact" href="#/contact">الاتصال</a>
+        <a class="nav-link" data-nav="location" href="#/location">الموقع</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <a href="admin.html" class="hidden h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 text-sm font-bold text-slate-600 transition hover:border-emerald-300 hover:text-emerald-700 sm:inline-flex" aria-label="لوحة الأساتذة">
+          <svg class="h-4 w-4 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span class="hidden xl:inline">دخول الأساتذة</span>
+        </a>
+        <button id="menu-button" type="button" class="grid h-11 w-11 place-items-center rounded-2xl border border-slate-200 bg-white text-slate-700 transition hover:text-emerald-700 lg:hidden" aria-expanded="false" aria-controls="mobile-menu" aria-label="فتح القائمة">
+          <svg class="menu-icon h-5 w-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+          <svg class="close-icon hidden h-5 w-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobile-menu" class="absolute inset-x-0 top-full hidden p-4 lg:hidden" inert>
+      <nav class="mx-auto max-w-lg rounded-3xl border border-slate-200/80 bg-white p-2 shadow-lg" aria-label="قائمة الهاتف">
+        <a data-mobile-nav="home" href="#/home" class="block">الرئيسية</a>
+        <a data-mobile-nav="news" href="#/news" class="block">الإعلانات</a>
+        <a data-mobile-nav="schedule" href="#/schedule" class="block">الجدول الدراسي</a>
+        <a data-mobile-nav="exams" href="#/exams" class="block">الاختبارات</a>
+        <a data-mobile-nav="contact" href="#/contact" class="block">الاتصال</a>
+        <a data-mobile-nav="location" href="#/location" class="block">موقع الثانوية</a>
+        <div class="my-2 border-t border-slate-100"></div>
+        <a href="admin.html" class="flex items-center gap-2 rounded-3xl px-4 py-3 font-bold text-slate-700 hover:bg-slate-50">
+          <svg class="h-4 w-4 fill-none stroke-emerald-600" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          دخول الأساتذة
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+
+    <!-- ============ الرئيسية ============ -->
+    <div class="route" data-page="home">
+      <section class="hero" aria-labelledby="home-title">
+        <span class="hero-glow -right-24 -top-24" aria-hidden="true"></span>
+        <span class="hero-glow gold bottom-0 left-1/4 h-56 w-56" style="background:var(--amber-200);opacity:.45" aria-hidden="true"></span>
+        <div class="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+          <div class="grid items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
+            <div>
+              <p class="fade-up inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-xs font-extrabold text-emerald-700">
+                الموقع الرسمي <span class="text-emerald-300" aria-hidden="true">•</span> <span data-academic-year>السنة الدراسية</span>
+              </p>
+              <h1 id="home-title" class="mt-6">
+                <span class="hero-word block text-lg font-bold text-slate-500 sm:text-xl" style="--delay:.08s">مرحباً بكم في</span>
+                <span class="hero-word mt-2 block text-4xl font-black leading-tight text-slate-900 sm:text-6xl lg:text-7xl" style="--delay:.2s" data-school-name></span>
+              </h1>
+              <p class="fade-up d1 mt-6 max-w-xl text-lg font-semibold leading-9 text-slate-600">
+                <span data-school-name></span> مؤسسة تعليمية عمومية تابعة لوزارة التربية الوطنية بمدينة العلمة.
+                نرافق تلاميذنا <b class="text-emerald-700">بالعلم والمثابرة والقيم</b>، ثلاث سنوات نحو البكالوريا.
+              </p>
+              <div class="fade-up d2 mt-8 flex flex-wrap gap-3">
+                <a href="#/news" class="btn-primary">آخر الإعلانات</a>
+                <a href="#/schedule" class="btn-outline">جدول قسمي</a>
+              </div>
+            </div>
+
+            <div class="fade-up d2">
+              <figure class="overflow-hidden rounded-[2.5rem] shadow-2xl">
+                <img src="https://images.pexels.com/photos/34211747/pexels-photo-34211747.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=900&w=1200"
+                  width="1200" height="900" alt="تلاميذ داخل قاعة دراسية" fetchpriority="high" decoding="async"
+                  onerror="this.closest('figure').hidden=true">
+              </figure>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white py-16 sm:py-20" aria-labelledby="goals-title">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="reveal max-w-3xl">
+            <p class="kicker">أهدافنا</p>
+            <h2 id="goals-title" class="title-balance mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">ثلاث ركائز نبني عليها مستقبل أبنائنا</h2>
+          </div>
+          <div class="mt-12 grid gap-8 sm:grid-cols-3">
+            <article class="reveal card lift p-7">
+              <span class="icon-chip h-12 w-12"><svg class="h-6 w-6 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg></span>
+              <h3 class="mt-5 text-xl font-extrabold text-slate-900">تعليم نوعي</h3>
+              <p class="mt-2.5 leading-7 text-slate-500">معرفة تُقدَّم بمنهجية واضحة تشجّع الفهم والتفكير النقدي.</p>
+            </article>
+            <article class="reveal card lift p-7">
+              <span class="icon-chip h-12 w-12"><svg class="h-6 w-6 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>
+              <h3 class="mt-5 text-xl font-extrabold text-slate-900">مرافقة وتوجيه</h3>
+              <p class="mt-2.5 leading-7 text-slate-500">متابعة مستمرة لمسار التلميذ واختيار شعبته بثقة ووعي.</p>
+            </article>
+            <article class="reveal card lift p-7">
+              <span class="icon-chip h-12 w-12"><svg class="h-6 w-6 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 7.5 8 9 4.5-1.5 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
+              <h3 class="mt-5 text-xl font-extrabold text-slate-900">قيم وانضباط</h3>
+              <p class="mt-2.5 leading-7 text-slate-500">احترام ومسؤولية ومواطنة تصنع بيئة مدرسية آمنة.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="latest-title">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="reveal flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p class="kicker">آخر الأخبار</p>
+              <h2 id="latest-title" class="title-balance mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">أحدث إعلانات الثانوية</h2>
+            </div>
+            <a href="#/news" class="font-extrabold text-emerald-700 hover:underline">كل الإعلانات ←</a>
+          </div>
+          <div id="home-news" class="reveal mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ الإعلانات ============ -->
+    <div class="route" data-page="news" hidden>
+      <section class="subhero py-14 sm:py-20">
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="مسار التصفح" class="crumb mb-6"><a href="#/home">الرئيسية</a><span aria-hidden="true">/</span><span aria-current="page">الإعلانات</span></nav>
+          <p class="text-xs font-extrabold text-amber-400">المعلومة في وقتها</p>
+          <h1 class="mt-4 text-4xl font-black sm:text-6xl">الأخبار والإعلانات</h1>
+          <p class="mt-5 max-w-2xl leading-8 text-white/75">كل جديد في المؤسسة: الدراسة، الأنشطة، والتواصل — بالصور والتواريخ.</p>
+        </div>
+      </section>
+      <section class="bg-white py-14 sm:py-18">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div id="news-filters" class="flex flex-wrap gap-2"></div>
+          <div id="news-list" class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ الجدول الدراسي ============ -->
+    <div class="route" data-page="schedule" hidden>
+      <section class="subhero py-14 sm:py-20">
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="مسار التصفح" class="crumb mb-6"><a href="#/home">الرئيسية</a><span aria-hidden="true">/</span><span aria-current="page">الجدول الدراسي</span></nav>
+          <p class="text-xs font-extrabold text-amber-400">القسم فقط</p>
+          <h1 class="mt-4 text-4xl font-black sm:text-6xl">جدول قسمك</h1>
+          <p class="mt-5 max-w-2xl leading-8 text-white/75">اختر قسمك لعرض جدوله الأسبوعي كاملاً: المواد والأوقات والقاعات.</p>
+        </div>
+      </section>
+      <section class="bg-white py-14 sm:py-18">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <label class="block">
+              <span class="mb-2 block text-xs font-extrabold text-slate-500">اختر القسم</span>
+              <select id="class-select" class="field !w-auto min-w-64"></select>
+            </label>
+            <button type="button" id="print-schedule" class="btn-outline !px-5 !py-2.5 text-sm">طباعة الجدول</button>
+          </div>
+          <div id="schedule-body" class="mt-8" aria-live="polite"></div>
+          <p class="mt-6 text-xs font-bold text-slate-400">البيانات كما اعتمدتها إدارة المؤسسة. عند أي تعديل يُحدَّث الجدول هنا فوراً.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ الاختبارات ============ -->
+    <div class="route" data-page="exams" hidden>
+      <section class="subhero py-14 sm:py-20">
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="مسار التصفح" class="crumb mb-6"><a href="#/home">الرئيسية</a><span aria-hidden="true">/</span><span aria-current="page">الاختبارات</span></nav>
+          <p class="text-xs font-extrabold text-amber-400">التواريخ</p>
+          <h1 class="mt-4 text-4xl font-black sm:text-6xl">الفروض والاختبارات</h1>
+          <p class="mt-5 max-w-2xl leading-8 text-white/75">المواعيد المعتمدة مرتبة زمنياً من الأقرب.</p>
+        </div>
+      </section>
+      <section class="bg-white py-14 sm:py-18">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-wrap gap-2">
+            <button type="button" data-exam-filter="الكل" class="filter-button" aria-pressed="true">الكل</button>
+            <button type="button" data-exam-filter="فرض" class="filter-button" aria-pressed="false">فروض</button>
+            <button type="button" data-exam-filter="اختبار" class="filter-button" aria-pressed="false">اختبارات</button>
+          </div>
+          <div id="exams-body" class="mt-8 grid gap-3" aria-live="polite"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ الاتصال ============ -->
+    <div class="route" data-page="contact" hidden>
+      <section class="subhero py-14 sm:py-20">
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="مسار التصفح" class="crumb mb-6"><a href="#/home">الرئيسية</a><span aria-hidden="true">/</span><span aria-current="page">الاتصال</span></nav>
+          <p class="text-xs font-extrabold text-amber-400">نحن في خدمتكم</p>
+          <h1 class="mt-4 text-4xl font-black sm:text-6xl">اتصل بنا</h1>
+          <p class="mt-5 max-w-2xl leading-8 text-white/75">بريد، هاتف، وموعد — كل قنوات التواصل مع الإدارة في مكان واحد.</p>
+        </div>
+      </section>
+
+      <section class="bg-white py-14">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="grid gap-6 md:grid-cols-3">
+            <a id="contact-email-card" href="#" class="lift card flex gap-4 p-6">
+              <span class="icon-chip h-11 w-11 shrink-0"><svg class="h-5 w-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
+              <div><h2 class="font-extrabold text-slate-900">البريد الإلكتروني</h2><p class="mt-1.5 break-all text-sm text-slate-500" data-school-email></p></div>
+            </a>
+            <a id="contact-phone-card" href="#" class="lift card flex gap-4 p-6" dir="ltr">
+              <span class="icon-chip h-11 w-11 shrink-0"><svg class="h-5 w-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+              <div class="text-right"><h2 class="font-extrabold text-slate-900">الهاتف</h2><p class="mt-1.5 text-sm font-bold text-slate-500" data-school-phone style="direction:ltr;text-align:right"></p></div>
+            </a>
+            <a href="#/location" class="lift card flex gap-4 p-6">
+              <span class="icon-chip h-11 w-11 shrink-0"><svg class="h-5 w-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+              <div><h2 class="font-extrabold text-slate-900">العنوان</h2><p class="mt-1.5 text-sm text-slate-500" data-school-address></p></div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 py-16">
+        <div class="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[.6fr_1.4fr] lg:px-8">
+          <div class="reveal">
+            <p class="kicker">وليّ الأمر</p>
+            <h2 class="title-balance mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">اطلب موعداً مع الإدارة</h2>
+            <p class="mt-5 leading-8 text-slate-500">املأ الطلب: يصل الإدارة مباشرة، وتحصل على رقم مرجعي لمتابعة الردّ. أيام العمل من الأحد إلى الخميس.</p>
+            <p class="mt-5 text-xs leading-6 text-slate-400" data-email-note></p>
+          </div>
+          <div class="reveal">
+            <form id="appointment-form" class="card p-6 sm:p-8" novalidate>
+              <div class="grid gap-5 sm:grid-cols-2">
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">اسم ولي الأمر</span>
+                  <input id="ap-name" required class="field" placeholder="الاسم الكامل">
+                  <small class="field-error mt-1 hidden font-bold text-red-600">أدخل الاسم الكامل.</small></label>
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">اسم التلميذ</span>
+                  <input id="ap-student" required class="field" placeholder="اسم ولقب التلميذ">
+                  <small class="field-error mt-1 hidden font-bold text-red-600">أدخل اسم التلميذ.</small></label>
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">القسم</span>
+                  <select id="ap-class" class="field"></select></label>
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">رقم الهاتف</span>
+                  <input id="ap-phone" type="tel" dir="ltr" required class="field" placeholder="0X XX XX XX XX">
+                  <small class="field-error mt-1 hidden font-bold text-red-600">أدخل رقماً صحيحاً (10 أرقام).</small></label>
+              </div>
+              <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">التاريخ المفضّل</span>
+                  <input id="ap-date" type="date" required class="field">
+                  <small class="mt-1 block text-[11px] font-bold text-slate-400">أيام العمل من الأحد إلى الخميس.</small>
+                  <small class="field-error mt-1 hidden font-bold text-red-600">اختر تاريخاً مستقبلياً ضمن أيام العمل.</small></label>
+                <label class="block"><span class="mb-2 block text-sm font-extrabold text-slate-700">الفترة</span>
+                  <select id="ap-slot" class="field"><option>صباحاً (08:00 – 12:00)</option><option>مساءً (13:00 – 16:30)</option></select></label>
+              </div>
+              <label class="mt-5 block"><span class="mb-2 block text-sm font-extrabold text-slate-700">سبب الطلب</span>
+                <textarea id="ap-reason" required rows="4" class="field resize-y leading-relaxed" placeholder="مثال: متابعة المستوى الدراسي ومناقشة النتائج"></textarea>
+                <small class="field-error mt-1 hidden font-bold text-red-600">اكتب سبباً من 15 حرفاً على الأقل.</small></label>
+              <div class="mt-7 flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-xs leading-6 text-slate-400">يصل طلبك إلى بريد الإدارة مع رقم مرجعي للمتابعة.</p>
+                <button type="submit" class="btn-primary shrink-0">إرسال الطلب
+                  <svg class="h-4 w-4 -scale-x-100 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                </button>
+              </div>
+            </form>
+            <div id="appointment-receipt" class="card mt-6 hidden p-6" aria-live="polite"></div>
+            <div class="card mt-6 p-6">
+              <h3 class="font-extrabold text-slate-900">طلباتك السابقة</h3>
+              <p class="mt-1 text-xs font-bold text-slate-400">محفوظة على هذا الجهاز فقط</p>
+              <div id="appointment-list" class="mt-4 space-y-3"></div>
+              <button id="appointment-clear" type="button" class="mt-4 hidden text-xs font-bold text-slate-500 hover:text-red-600">حذف كل الطلبات المحفوظة</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ الموقع ============ -->
+    <div class="route" data-page="location" hidden>
+      <section class="subhero py-14 sm:py-20">
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="مسار التصفح" class="crumb mb-6"><a href="#/home">الرئيسية</a><span aria-hidden="true">/</span><span aria-current="page">الموقع</span></nav>
+          <p class="text-xs font-extrabold text-amber-400">اعثر علينا بسهولة</p>
+          <h1 class="mt-4 text-4xl font-black sm:text-6xl">موقع الثانوية</h1>
+          <p class="mt-5 max-w-2xl leading-8 text-white/75" data-school-address></p>
+        </div>
+      </section>
+      <section class="bg-white py-14 sm:py-18">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-100 shadow-sm">
+            <iframe class="h-[430px] w-full border-0 sm:h-[560px]" title="خريطة موقع ثانوية دردار بوزيد" loading="lazy" referrerpolicy="no-referrer"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=5.6601362%2C36.1544303%2C5.6801362%2C36.1684303&amp;layer=mapnik&amp;marker=36.1614303%2C5.6701362"></iframe>
+          </div>
+          <div class="mt-10 flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p class="kicker">العنوان</p>
+              <h2 class="mt-4 text-3xl font-extrabold text-slate-900">حي التساهمي، العلمة</h2>
+              <p class="mt-2 text-lg text-slate-500">ولاية سطيف، الجزائر</p>
+              <div class="mt-6 flex flex-wrap gap-3">
+                <a id="maps-open" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                  <svg class="h-5 w-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  فتح في خرائط Google</a>
+                <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Lyc%C3%A9e%20Dardar%20Bouzid%2C%20El%20Eulma%2C%20S%C3%A9tif" target="_blank" rel="noopener noreferrer" class="btn-outline">احصل على الاتجاهات</a>
+              </div>
+            </div>
+            <div class="grid gap-4 text-sm">
+              <p class="flex items-center gap-2 font-bold text-slate-600"><span class="icon-chip h-9 w-9"><svg class="h-4 w-4 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>أيام العمل: الأحد – الخميس</p>
+              <p class="flex items-center gap-2 font-bold text-slate-600"><span class="icon-chip h-9 w-9"><svg class="h-4 w-4 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span data-school-phone></span></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="bg-slate-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <div class="grid gap-12 lg:grid-cols-[1.25fr_.75fr_1fr]">
+        <div>
+          <div class="flex items-center gap-3">
+            <span class="brand-mark h-12 w-12 rounded-2xl" aria-hidden="true"><svg class="h-6 w-6 fill-none stroke-current" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg></span>
+            <div><p class="text-base font-extrabold" data-school-name></p><p class="mt-0.5 text-xs font-semibold text-white/60" data-school-city></p></div>
+          </div>
+          <p class="mt-6 max-w-md leading-8 text-white/60">مؤسسة تربوية عمومية ترافق تلاميذها نحو النجاح، وترسّخ قيم العلم والانضباط والمواطنة.</p>
+        </div>
+        <div>
+          <h2 class="text-sm font-extrabold text-amber-400">روابط سريعة</h2>
+          <nav class="mt-5 grid gap-3 text-sm text-white/65">
+            <a href="#/news" class="hover:text-white">الإعلانات</a>
+            <a href="#/schedule" class="hover:text-white">الجدول الدراسي</a>
+            <a href="#/exams" class="hover:text-white">الاختبارات</a>
+            <a href="#/contact" class="hover:text-white">الاتصال والموعد</a>
+            <a href="admin.html" class="hover:text-white">دخول الأساتذة</a>
+          </nav>
+        </div>
+        <div>
+          <h2 class="text-sm font-extrabold text-amber-400">روابط رسمية</h2>
+          <div class="mt-5 grid gap-3 text-sm text-white/65">
+            <a href="https://www.education.gov.dz/" target="_blank" rel="noopener noreferrer" class="hover:text-white">وزارة التربية الوطنية</a>
+            <a href="https://awlyaa.education.gov.dz/" target="_blank" rel="noopener noreferrer" class="hover:text-white">فضاء أولياء التلاميذ</a>
+            <a href="https://bac.onec.dz/" target="_blank" rel="noopener noreferrer" class="hover:text-white">بوابة البكالوريا</a>
+            <a data-mailto-link href="#" class="break-all hover:text-white" data-school-email></a>
+          </div>
+        </div>
+      </div>
+      <div class="mt-12 border-t border-white/10 pt-6 text-xs text-white/55 sm:flex sm:items-center sm:justify-between">
+        <p>© <span id="year"></span> <span data-school-name></span>. جميع الحقوق محفوظة.</p>
+        <p class="mt-2 sm:mt-0">العلم • المثابرة • القيم</p>
+      </div>
+    </div>
+  </footer>
+
+  <button id="back-top" type="button" class="back-top fixed bottom-5 left-5 z-40 grid h-11 w-11 place-items-center rounded-2xl bg-emerald-600 text-white shadow-lg" aria-label="العودة إلى أعلى">
+    <svg class="h-5 w-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7M12 19V5"/></svg>
+  </button>
+  <div id="toast" class="toast fixed bottom-20 right-5 z-[120] max-w-sm rounded-2xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-2xl" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const S = CONFIG.school;
+      const routes = {
+        home: ["ثانوية دردار بوزيد | العلمة - سطيف"],
+        news: ["الإعلانات | ثانوية دردار بوزيد"],
+        schedule: ["الجدول الدراسي | ثانوية دردار بوزيد"],
+        exams: ["الاختبارات | ثانوية دردار بوزيد"],
+        contact: ["اتصل بنا | ثانوية دردار بوزيد"],
+        location: ["موقع الثانوية | ثانوية دردار بوزيد"]
+      };
+
+      const state = { announcements: [], classes: [], schedule: [], exams: [] };
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+      const escapeHtml = v => String(v ?? "").replace(/[&<>'"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;" })[c]);
+
+      let examFilter = "الكل", newsFilter = "الكل", selectedClass = null;
+      let toastTimer;
+
+      function toast(text) { const el = $("#toast"); el.textContent = text; el.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 3400); }
+
+      function fmtDate(iso) {
+        if (!iso) return "";
+        const d = new Date(String(iso).length <= 10 ? iso + "T00:00:00" : iso);
+        return isNaN(d) ? String(iso) : d.toLocaleDateString("ar-DZ", { day: "numeric", month: "long", year: "numeric" });
+      }
+      function academicYear() { const n = new Date(); const s = n.getMonth() >= 7 ? n.getFullYear() : n.getFullYear() - 1; return `السنة الدراسية ${s} – ${s + 1}`; }
+
+      /* ---------- التوجيه ---------- */
+      function getRoute() { const p = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean); return routes[p[0]] ? p[0] : "home"; }
+      function renderRoute() {
+        const name = getRoute();
+        $$('[data-page]').forEach(pg => { pg.hidden = pg.dataset.page !== name; });
+        $$('[data-nav], [data-mobile-nav]').forEach(l => {
+          const active = (l.dataset.nav || l.dataset.mobileNav) === name;
+          l.classList.toggle("active", active);
+          active ? l.setAttribute("aria-current", "page") : l.removeAttribute("aria-current");
+        });
+        document.title = routes[name][0];
+        closeMenu();
+        scrollTo({ top: 0, behavior: "auto" });
+        setTimeout(observeReveals, 60);
+      }
+
+      /* ---------- القائمة والتمرير ---------- */
+      function closeMenu() {
+        const menu = $("#mobile-menu"), btn = $("#menu-button");
+        if (!menu || menu.classList.contains("hidden")) return;
+        menu.classList.add("hidden"); menu.setAttribute("inert", "");
+        btn.setAttribute("aria-expanded", "false"); btn.setAttribute("aria-label", "فتح القائمة");
+        $(".menu-icon", btn).classList.remove("hidden"); $(".close-icon", btn).classList.add("hidden");
+      }
+      let ticking = false;
+      function onScroll() {
+        $("#site-header").classList.toggle("is-scrolled", scrollY > 18);
+        $("#back-top").classList.toggle("show", scrollY > 650);
+        ticking = false;
+      }
+
+      /* ---------- الظهور التدريجي ---------- */
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let observer;
+      function observeReveals() {
+        if (reduced || !("IntersectionObserver" in window)) { $$(".reveal").forEach(i => i.classList.add("is-visible")); return; }
+        observer ||= new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("is-visible"); observer.unobserve(e.target); } }), { threshold: .12 });
+        $$(".reveal:not(.is-visible)").forEach(i => observer.observe(i));
+      }
+
+      /* ---------- الإعلانات ---------- */
+      function byDateDesc(list) { return [...list].sort((a, b) => String(b.date || b.created_at || "").localeCompare(String(a.date || a.created_at || ""))); }
+
+      function newsCard(item) {
+        return `<article class="news-card card lift overflow-hidden">
+          ${item.image_url ? `<img src="${escapeHtml(item.image_url)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<div class="grid aspect-[16/10] place-items-center bg-emerald-50"><span class="icon-chip h-12 w-12"><svg class="h-6 w-6 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span></div>`}
+          <div class="p-6">
+            <div class="flex items-center justify-between gap-3">
+              <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-extrabold text-emerald-700">${escapeHtml(item.category || "عام")}</span>
+              <span class="text-[11px] font-bold text-slate-400">${escapeHtml(fmtDate(item.date || item.created_at))}</span>
+            </div>
+            <h3 class="mt-3 text-lg font-extrabold leading-8 text-slate-900">${escapeHtml(item.title)}</h3>
+            <p class="mt-2 text-sm leading-7 text-slate-500">${escapeHtml(item.body)}</p>
+          </div>
+        </article>`;
+      }
+      function renderHomeNews() {
+        $("#home-news").innerHTML = byDateDesc(state.announcements).slice(0, 3).map(newsCard).join("") || `<p class="text-slate-500">لا إعلانات منشورة بعد.</p>`;
+      }
+      function renderNewsFilters() {
+        const cats = ["الكل", ...new Set(state.announcements.map(i => i.category || "عام"))];
+        $("#news-filters").innerHTML = cats.map(c => `<button data-news-filter="${escapeHtml(c)}" type="button" aria-pressed="${c === newsFilter}" class="filter-button">${escapeHtml(c)}</button>`).join("");
+      }
+      function renderNews() {
+        const list = byDateDesc(state.announcements.filter(i => newsFilter === "الكل" || (i.category || "عام") === newsFilter));
+        $("#news-list").innerHTML = list.length ? list.map(newsCard).join("")
+          : `<div class="empty-state sm:col-span-2 lg:col-span-3"><p class="font-extrabold text-slate-900">لا إعلانات في هذا التصنيف</p></div>`;
+      }
+
+      /* ---------- الجدول الدراسي ---------- */
+      function renderClassSelect() {
+        const sel = $("#class-select");
+        sel.innerHTML = state.classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+        if (selectedClass != null && state.classes.some(c => String(c.id) === String(selectedClass))) sel.value = String(selectedClass);
+        selectedClass = sel.value;
+      }
+      function renderSchedule() {
+        const rows = state.schedule.filter(r => String(r.class_id) === String(selectedClass));
+        const box = $("#schedule-body");
+        if (!rows.length) {
+          box.innerHTML = `<div class="empty-state"><p class="font-extrabold text-slate-900">لا حصص مسجّلة لهذا القسم بعد</p><p class="mx-auto mt-2 max-w-md text-sm leading-7 text-slate-500">عند نشر الجدول من لوحة الأساتذة يظهر هنا فوراً.</p></div>`;
+          return;
+        }
+        /* أزواج الوقت الفريدة مرتبة */
+        const slots = [...new Map(rows.map(r => [`${r.start_time}-${r.end_time}`, { start_time: r.start_time, end_time: r.end_time }])).values()]
+          .sort((a, b) => String(a.start_time).localeCompare(String(b.start_time)));
+        const cell = day => {
+          const slotRows = rows.filter(r => Number(r.day) === day);
+          const match = slots.find(s => slotRows.some(r => r.start_time === s.start_time));
+          return match;
+        };
+        let html = `<div class="timetable-wrap"><table class="timetable"><thead><tr><th>التوقيت</th>${DAYS.map(d => `<th>${d}</th>`).join("")}</tr></thead><tbody>`;
+        slots.forEach(slot => {
+          html += `<tr><td class="time-cell">${escapeHtml(slot.start_time)}<br>${escapeHtml(slot.end_time)}</td>`;
+          DAYS.forEach((_, day) => {
+            const r = rows.find(x => Number(x.day) === day && x.start_time === slot.start_time && x.end_time === slot.end_time);
+            html += r ? `<td class="slot">${escapeHtml(r.subject || "حصة")}${r.room ? `<small>${escapeHtml(r.room)}</small>` : ""}</td>` : `<td class="empty-slot">—</td>`;
+          });
+          html += `</tr>`;
+        });
+        html += `</tbody></table></div>`;
+        box.innerHTML = html;
+      }
+
+      /* ---------- الاختبارات ---------- */
+      function renderExams() {
+        const list = state.exams
+          .filter(e => examFilter === "الكل" || (e.type || "").includes(examFilter))
+          .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+        const box = $("#exams-body");
+        if (!state.exams.length) {
+          box.innerHTML = `<div class="empty-state"><p class="font-extrabold text-slate-900">لم تُنشر رزنامة الاختبارات بعد</p><p class="mx-auto mt-2 max-w-md text-sm leading-7 text-slate-500">تُنشر المواعيد فور اعتمادها رسمياً.</p></div>`;
+          return;
+        }
+        if (!list.length) {
+          box.innerHTML = `<div class="empty-state"><p class="font-extrabold text-slate-900">لا مواعيد من هذا النوع حالياً</p></div>`;
+          return;
+        }
+        box.innerHTML = list.map(e => `<div class="exam-row">
+          <span class="time-pill">${escapeHtml(fmtDate(e.date))}</span>
+          <span class="min-w-0"><b class="block font-extrabold text-slate-900">${escapeHtml(e.subject || "مادة")}</b>
+          <small class="mt-0.5 block text-xs font-bold text-slate-400">${escapeHtml(e.scope || "")}</small></span>
+          <span class="exam-level flex items-center gap-2"><small class="text-xs font-bold text-slate-500">${LEVELS[e.level] || ""}</small><span class="badge-live">${escapeHtml(e.type || "موعد")}</span></span>
+        </div>`).join("");
+      }
+
+      /* ---------- طلب الموعد ---------- */
+      const MY_KEY = "dardar-my-requests";
+      function readMine() { try { return JSON.parse(localStorage.getItem(MY_KEY)) || []; } catch (_) { return []; } }
+      function writeMine(list) { try { localStorage.setItem(MY_KEY, JSON.stringify(list)); } catch (_) {} }
+
+      function validateAp(f) {
+        const err = f.parentElement.querySelector(".field-error");
+        let ok = !(f.required && !f.value.trim());
+        if (f.id === "ap-reason" && f.value.trim().length < 15) ok = false;
+        if (f.id === "ap-phone" && f.value && !/^[0-9\s+()]{9,16}$/.test(f.value.trim())) ok = false;
+        if (f.id === "ap-date" && f.value) {
+          const d = new Date(f.value + "T00:00:00"), t = new Date(); t.setHours(0, 0, 0, 0);
+          if (d < t || d.getDay() === 5 || d.getDay() === 6) ok = false;
+        }
+        f.classList.toggle("border-red-400", !ok);
+        err?.classList.toggle("hidden", ok);
+        return ok;
+      }
+      function renderMyList() {
+        const box = $("#appointment-list"), clear = $("#appointment-clear");
+        const list = readMine().sort((a, b) => String(b.at).localeCompare(String(a.at)));
+        if (!list.length) { box.innerHTML = `<p class="text-sm leading-7 text-slate-400">لا طلبات على هذا الجهاز بعد.</p>`; clear.classList.add("hidden"); return; }
+        clear.classList.remove("hidden");
+        box.innerHTML = list.map(a => `<div class="rounded-2xl border border-slate-200 p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2"><span class="ref-pill">${escapeHtml(a.ref)}</span><small class="text-xs font-bold text-slate-400">${escapeHtml(a.at)}</small></div>
+          <p class="mt-2 text-sm font-bold text-slate-700">${escapeHtml(a.student)} — ${escapeHtml(a.date)}</p>
+          <p class="mt-1 text-xs text-slate-500">${escapeHtml(a.slot)} • ${escapeHtml(a.status)}</p>
+        </div>`).join("");
+      }
+
+      async function submitAppointment(e) {
+        e.preventDefault();
+        const fields = [$("#ap-name"), $("#ap-student"), $("#ap-phone"), $("#ap-date"), $("#ap-reason")];
+        const ok = fields.map(validateAp);
+        if (!ok.every(Boolean)) { fields[ok.indexOf(false)].focus(); toast("يرجى مراجعة الحقول المطلوبة"); return; }
+        const btn = e.submitter || $("#appointment-form button[type=submit]");
+        btn.disabled = true; btn.textContent = "جارٍ الإرسال…";
+        const data = {
+          parent_name: $("#ap-name").value.trim(),
+          student_name: $("#ap-student").value.trim(),
+          class_name: $("#ap-class").selectedOptions[0]?.textContent || "",
+          phone: $("#ap-phone").value.trim(),
+          preferred_date: $("#ap-date").value,
+          slot: $("#ap-slot").value,
+          reason: $("#ap-reason").value.trim()
+        };
+        let result;
+        try { result = await DB.submitAppointment(data); }
+        catch (_) { result = { ref: "AP-محلي", stored: false, emailed: false, mailto: "", bodyText: "" }; }
+        btn.disabled = false;
+
+        const mine = readMine();
+        mine.push({ ref: result.ref, at: new Date().toLocaleDateString("ar-DZ"), student: data.student_name, date: data.preferred_date, slot: data.slot, status: result.emailed ? "أُرسل بالإلكترون" : "بانتظار الإرسال" });
+        writeMine(mine); renderMyList();
+
+        const receipt = $("#appointment-receipt");
+        receipt.classList.remove("hidden");
+        receipt.innerHTML = `
+          <span class="badge-live">تم تسجيل الطلب</span>
+          <h3 class="mt-4 font-extrabold text-slate-900">رقمك المرجعي</h3>
+          <p class="ref-pill mt-2">${escapeHtml(result.ref)}</p>
+          ${result.emailed
+            ? `<p class="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-7 text-emerald-800">وصل طلبك إلى بريد الإدارة مباشرة. احتفظ بالرقم المرجعي لمتابعة الردّ.</p>`
+            : result.stored
+              ? `<p class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900">حُفظ طلبك وسُجّل في لوحة الإدارة. أرسله أيضاً بالبريد بالضغط على الزر أدناه.</p><a href="${escapeHtml(result.mailto)}" class="btn-primary mt-4 w-full">إرسال بالبريد أيضاً</a>`
+              : `<p class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900">اضغط الزر لإرسال الطلب عبر تطبيق البريد في جهازك.</p><a href="${escapeHtml(result.mailto)}" class="btn-primary mt-4 w-full">إرسال الطلب</a>`}
+          <p class="mt-4 text-xs leading-6 text-slate-400">يُعتبر الموعد مثبّتاً فقط بعد ردّ صريح من إدارة المؤسسة.</p>`;
+        receipt.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
+        toast(result.emailed ? "أُرسل الطلب إلى الإدارة" : "تم تسجيل الطلب");
+        e.target.reset();
+      }
+
+      /* ---------- التهيئة ---------- */
+      function fillSchoolInfo() {
+        $$("[data-school-name]").forEach(i => i.textContent = S.name);
+        $$("[data-school-city]").forEach(i => i.textContent = S.city);
+        $$("[data-school-email]").forEach(i => i.textContent = S.email);
+        $$("[data-school-phone]").forEach(i => i.textContent = S.phone);
+        $$("[data-school-address]").forEach(i => i.textContent = S.address);
+        $$("[data-academic-year]").forEach(i => i.textContent = academicYear());
+        $("#contact-email-card").href = `mailto:${S.email}`;
+        $("#contact-phone-card").href = `tel:${S.phone.replace(/\s/g, "")}`;
+        $("#maps-open").href = S.maps;
+        const mail = $("[data-mailto-link]"); if (mail) mail.href = `mailto:${S.email}`;
+        $$("[data-email-note]").forEach(i => i.textContent = DB.mode === "local"
+          ? "الوضع المحلي: يُفتح تطبيق البريد في جهازك لإرسال الطلب."
+          : "الطلب يصل بريد الإدارة مباشرة عند الإرسال.");
+        if (DB.mode === "local") $("#mode-banner").hidden = false;
+      }
+
+      async function loadData() {
+        state.announcements = await DB.list("announcements");
+        state.classes = await DB.list("classes");
+        state.schedule = await DB.list("schedule");
+        state.exams = await DB.list("exams");
+        renderHomeNews(); renderNewsFilters(); renderNews();
+        renderClassSelect(); renderSchedule(); renderExams();
+        const apClass = $("#ap-class");
+        apClass.innerHTML = state.classes.map(c => `<option>${escapeHtml(c.name)}</option>`).join("");
+      }
+
+      function initEvents() {
+        addEventListener("hashchange", renderRoute);
+        addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+        $("#menu-button").addEventListener("click", () => {
+          const menu = $("#mobile-menu"), btn = $("#menu-button"), open = menu.classList.contains("hidden");
+          menu.classList.toggle("hidden", !open);
+          open ? menu.removeAttribute("inert") : menu.setAttribute("inert", "");
+          btn.setAttribute("aria-expanded", String(open)); btn.setAttribute("aria-label", open ? "إغلاق القائمة" : "فتح القائمة");
+          $(".menu-icon", btn).classList.toggle("hidden", open); $(".close-icon", btn).classList.toggle("hidden", !open);
+        });
+        $("#mobile-menu").addEventListener("click", e => { if (e.target.closest("a")) closeMenu(); });
+        $("#back-top").addEventListener("click", () => scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }));
+
+        $("#news-filters").addEventListener("click", e => {
+          const b = e.target.closest("[data-news-filter]"); if (!b) return;
+          newsFilter = b.dataset.newsFilter; renderNewsFilters(); renderNews();
+        });
+        $$('[data-exam-filter]').forEach(b => b.addEventListener("click", () => {
+          examFilter = b.dataset.examFilter;
+          $$('[data-exam-filter]').forEach(i => i.setAttribute("aria-pressed", String(i === b)));
+          renderExams();
+        }));
+        $("#class-select").addEventListener("change", e => { selectedClass = e.target.value; renderSchedule(); });
+        $("#print-schedule").addEventListener("click", () => print());
+
+        $("#appointment-form").addEventListener("input", e => { if (e.target.matches("input,textarea,select")) validateAp(e.target); });
+        $("#appointment-form").addEventListener("submit", submitAppointment);
+        $("#appointment-clear").addEventListener("click", () => { writeMine([]); renderMyList(); toast("تم حذف الطلبات المحفوظة"); });
+
+        const apDate = $("#ap-date");
+        const t = new Date(); t.setHours(0, 0, 0, 0); t.setDate(t.getDate() + 1);
+        apDate.min = t.toISOString().slice(0, 10);
+      }
+
+      async function init() {
+        fillSchoolInfo();
+        $("#year").textContent = new Date().getFullYear();
+        initEvents();
+        await loadData();
+        if (!location.hash) history.replaceState(null, "", "#/home");
+        renderRoute(); observeReveals(); onScroll();
+      }
+      init();
+    })();
+  </script>
+</body>
+</html>
